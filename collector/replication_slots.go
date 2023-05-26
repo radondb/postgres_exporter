@@ -53,9 +53,9 @@ var pgReplicationSlot = map[string]*prometheus.Desc{
 
 func (PGReplicationSlotCollector) Update(ctx context.Context, db *sql.DB, ch chan<- prometheus.Metric) error {
 	rows, err := db.QueryContext(ctx,
-		`SELECT
+		`SELECT 
 			slot_name,
-			pg_current_wal_lsn() - '0/0' AS current_wal_lsn,
+			(case pg_is_in_recovery() when 't' then pg_last_wal_receive_lsn() - '0/0' else pg_current_wal_lsn() - '0/0' end) as current_wal_lsn,
 			coalesce(confirmed_flush_lsn, '0/0') - '0/0',
 			active
 		FROM
