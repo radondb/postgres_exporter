@@ -112,8 +112,9 @@ var queryOverrides = map[string][]OverrideQuery{
 		{
 			semver.MustParseRange(">=10.0.0"),
 			`
-			SELECT slot_name, database, active, pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)
-			FROM pg_replication_slots
+			SELECT slot_name, database, active, 
+			       (case pg_is_in_recovery() when 't' then pg_last_wal_receive_lsn() - restart_lsn else pg_current_wal_lsn() - restart_lsn end) as pg_wal_lsn_diff
+			FROM pg_replication_slots;
 			`,
 		},
 	},
