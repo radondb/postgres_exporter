@@ -86,7 +86,7 @@ This will build the docker image as `prometheuscommunity/postgres_exporter:${bra
 * `web.systemd-socket`
   Use systemd socket activation listeners instead of port listeners (Linux only). Default is `false`
 
-* `web.listen-address`
+* `web.listenAddress`
   Address to listen on for web interface and telemetry. Default is `:9187`.
 
 * `web.config.file`
