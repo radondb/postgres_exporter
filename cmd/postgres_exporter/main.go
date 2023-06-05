@@ -38,6 +38,7 @@ var (
 		Config: &config.Config{},
 	}
 
+	listenAddress          = kingpin.Flag("web.listenAddress", "Address to listen on for web interface and telemetry.").Default(":9187").Envar("PG_EXPORTER_WEB_LISTEN_ADDRESS").Strings()
 	configFile             = kingpin.Flag("config.file", "Postgres exporter configuration file.").Default("postgres_exporter.yml").String()
 	webConfig              = kingpinflag.AddFlags(kingpin.CommandLine, ":9187")
 	metricsPath            = kingpin.Flag("web.telemetry-path", "Path under which to expose metrics.").Default("/metrics").Envar("PG_EXPORTER_WEB_TELEMETRY_PATH").String()
@@ -156,6 +157,8 @@ func main() {
 
 	http.HandleFunc("/probe", handleProbe(logger, excludedDatabases))
 
+	// set WebListenAddresses from PG_EXPORTER_WEB_LISTEN_ADDRESS env or --web.listenAddress param
+	webConfig.WebListenAddresses = listenAddress
 	srv := &http.Server{}
 	if err := web.ListenAndServe(srv, webConfig, logger); err != nil {
 		level.Error(logger).Log("msg", "Error running HTTP server", "err", err)
